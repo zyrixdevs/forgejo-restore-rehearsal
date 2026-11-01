@@ -15,6 +15,7 @@ Interview self-hosters and small organizations that administer their own Forgejo
 5. What do you use now, and what would make you switch or add a tool?
 6. Have you considered or built a disposable restore test? What does it fail to cover compared with your actual backup and deployment?
 7. Who owns the recovery evidence, and when did they last pay for a restore drill, MSP support, or audit evidence? What budget and purchase process applied?
+8. Would a Forgejo recipe for an existing restore runner meet the need, or do you require a dedicated service? What would still justify paying for help?
 
 Ask for a recent concrete example. Do not pitch the product before collecting the current workflow.
 

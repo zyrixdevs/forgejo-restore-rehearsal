@@ -49,6 +49,10 @@ This checks ZIP entry integrity only; it does not prove database consistency or 
 
 The report lists likely presence for attachments, LFS, avatars, repository avatars/archives, packages, Actions data, and custom files. It also reads `STORAGE_TYPE` values from `app.ini` and identifies components configured for MinIO/S3; it cannot verify that the external object store was backed up. When Forgejo's built-in SSH server is enabled, it reports whether the configured host-key filenames appear in the archive. It flags Redis queues and external search indexers for separate recovery planning. These are configuration-derived warnings, not proof the dependencies were backed up. Required optional components must be chosen by the operator. Custom local paths, external secret files, database validity, consistency, and application behavior are not verified. Read [`docs/MARKET_RESEARCH.md`](docs/MARKET_RESEARCH.md) before treating this as a product direction.
 
+## Restic restore checks
+
+If Restic backs up Forgejo's `WORK_PATH` and the instance uses the default SQLite database, [`integrations/restorable/forgejo.yaml`](integrations/restorable/forgejo.yaml) adds a Restorable recipe that restores the snapshot into its disposable sandbox, samples file checksums, and runs SQLite integrity validation. Copy it into the directory referenced by your Restorable `agent.yaml` `recipes` setting. Adjust paths for custom layouts; PostgreSQL, external storage, and full application startup are not covered by this recipe. See [Restorable's recipe guide](https://github.com/restorable-dev/restorable#check-types).
+
 ## License
 
 MIT. See [LICENSE](LICENSE).

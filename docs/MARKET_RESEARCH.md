@@ -32,7 +32,7 @@ The current prototype offers an opt-in ZIP CRC scan, itemized component inventor
 
 ## Hypothesis to validate
 
-Keep the checker free as a local preflight. The paid hypothesis is a Forgejo-aware runner or supervised service that restores a customer's native dump in a disposable, network-isolated environment, verifies a known repository commit and application health, and produces dated recovery evidence. Candidate buyers are MSPs and small teams responsible for several Forgejo instances; pricing could be per drill or per instance, but no price is justified yet. The product must be materially easier and safer to reuse than stack-specific scripts, and offer Forgejo checks absent from generic restore tools. Before expanding into hosted scheduling, seek five operator interviews, two supervised pilots, and one explicit paid-pilot commitment. These are proposed gates, not achievements.
+Keep the preflight and Restorable recipe free. The paid hypothesis is setup/support and supervised restore drills for MSPs managing multiple Forgejo instances, using an isolated Restorable run and customer-ready evidence. Sell per drill initially; no price is justified yet. A standalone runner is worth building only if interviews find Forgejo-specific checks the generic engine cannot handle. Before expanding into hosted scheduling, seek five operator interviews, two supervised pilots, and one explicit paid-pilot commitment. These are proposed gates, not achievements.
 
 ## Risks and unknowns
 
