@@ -37,6 +37,14 @@ STORAGE_SECTIONS = {
     "actions_logs": "storage.actions_log",
     "actions_artifacts": "actions.artifacts",
 }
+PATH_SETTINGS = {
+    "server": ("APP_DATA_PATH",),
+    "database": ("PATH",),
+    "repository": ("ROOT",),
+    "queue": ("DATADIR",),
+    "indexer": ("ISSUE_INDEXER_PATH", "REPO_INDEXER_PATH"),
+    **{section: ("PATH",) for section in STORAGE_SECTIONS.values()},
+}
 
 
 def safe_member_path(name):
@@ -144,12 +152,17 @@ def inspect(paths, verify_integrity=False, required_components=(), allow_empty_r
     ssh_enabled = None if not config_files else False
     ssh_host_key_names = set()
     external_dependencies = set()
+    configured_path_settings = set()
     if config_files:
         config["secret_key_configured"] = False
         config["oauth_jwt_secret_configured"] = False
     for config_bytes in config_files:
         parser = configparser.ConfigParser(interpolation=None)
         parser.read_string(config_bytes.decode("utf-8", errors="replace"))
+        for section, options in PATH_SETTINGS.items():
+            for option in options:
+                if parser.has_option(section, option):
+                    configured_path_settings.add(f"{section}.{option}".lower())
         config["secret_key_configured"] |= bool(
             parser.get("security", "SECRET_KEY", fallback="").strip()
             or parser.get("security", "SECRET_KEY_URI", fallback="").strip()
@@ -222,6 +235,7 @@ def inspect(paths, verify_integrity=False, required_components=(), allow_empty_r
         "components_using_external_minio_storage": [
             component for component, storage_type in storage_types.items() if storage_type == "minio"
         ],
+        "configured_path_settings_to_review": sorted(configured_path_settings),
         "configured_recovery_dependencies_needing_attention": sorted(external_dependencies),
         "required_optional_components": list(required_components),
         "missing_required_optional_components": missing_required_components,
