@@ -3,6 +3,7 @@
 
 import argparse
 import configparser
+import gzip
 import json
 import lzma
 import stat
@@ -108,16 +109,27 @@ def inspect(paths, verify_integrity=False, required_components=(), allow_empty_r
     app_ini_found = False
     unsafe_archive_paths_ignored = 0
     integrity_checks = []
+    input_integrity_checks = []
     per_archive_core_components = []
     for path in paths:
         if verify_integrity:
             if zipfile.is_zipfile(path):
                 with zipfile.ZipFile(path) as archive:
-                    integrity_checks.append("failed" if archive.testzip() else "passed")
+                    status = "failed" if archive.testzip() else "passed"
+                integrity_checks.append(status)
+                input_integrity_checks.append(status)
+            elif str(path).lower().endswith(".sql.gz"):
+                with gzip.open(path, "rb") as stream:
+                    while stream.read(1024 * 1024):
+                        pass
+                integrity_checks.append("unsupported")
+                input_integrity_checks.append("passed")
             else:
                 integrity_checks.append("unsupported")
+                input_integrity_checks.append("unsupported")
         else:
             integrity_checks.append("not_requested")
+            input_integrity_checks.append("not_requested")
         members = archive_members(path)
         if len(names) + len(members) > MAX_MEMBERS:
             raise ValueError(f"too many archive entries across inputs (limit {MAX_MEMBERS})")
@@ -260,6 +272,7 @@ def inspect(paths, verify_integrity=False, required_components=(), allow_empty_r
         "entry_count": len(names),
         "unsafe_archive_paths_ignored": unsafe_archive_paths_ignored,
         "zip_crc_checks_in_input_order": integrity_checks,
+        "input_integrity_checks_in_input_order": input_integrity_checks,
         "core_components": core_components,
         "per_archive_core_components": per_archive_core_components,
         "core_components_look_present": core_components_look_present,
@@ -305,7 +318,7 @@ def main():
     # ORIGINAL (preserved, not deleted — disabled by comment): parser.add_argument("archives", nargs="+", help="tar, tar.gz, tgz, or zip backup archives")
     parser.add_argument("archives", nargs="+", help="tar/zip backups or SQL database dump files")
     parser.add_argument("--report", help="write JSON report to a new file (default: stdout)")
-    parser.add_argument("--verify-integrity", action="store_true", help="read each ZIP entry and verify its CRC; other formats are reported unsupported")
+    parser.add_argument("--verify-integrity", action="store_true", help="verify ZIP entry CRCs and standalone .sql.gz streams; other formats are reported unsupported")
     parser.add_argument("--require-component", action="append", choices=OPTIONAL_COMPONENTS, default=[], metavar="NAME", help="require an optional component; repeat for each (" + ", ".join(OPTIONAL_COMPONENTS) + ")")
     parser.add_argument("--allow-empty-repositories", action="store_true", help="waive the repository candidate check for an instance known to contain no repositories")
     args = parser.parse_args()
@@ -321,7 +334,7 @@ def main():
             return 1
         if report["missing_required_optional_components"]:
             return 1
-        if args.verify_integrity and any(status != "passed" for status in report["zip_crc_checks_in_input_order"]):
+        if args.verify_integrity and any(status != "passed" for status in report["input_integrity_checks_in_input_order"]):
             return 1
         return 0
     except (OSError, EOFError, RuntimeError, lzma.LZMAError, zlib.error, tarfile.TarError, zipfile.BadZipFile, ValueError, configparser.Error) as error:
