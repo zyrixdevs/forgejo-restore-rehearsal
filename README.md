@@ -32,6 +32,15 @@ Keep the native-dump checker and Restorable recipe open source. The candidate bu
 
 ## Development
 
+Install the current source directly with [`pipx`](https://pipx.pypa.io/):
+
+```sh
+pipx install git+https://github.com/zyrixdevs/forgejo-restore-rehearsal.git
+forgejo-recovery-check --help
+```
+
+The CLI uses only the Python standard library. This installs the current repository version; it is not a versioned PyPI release.
+
 The preflight inventories archive names and reads up to 1 MiB from `app.ini` to check whether the two documented secret settings are configured. It distinguishes SQLite files from SQL dumps, recognizes repository and storage entries, and reports whether core candidates appear present. It does not extract archives or print setting values. If no inspectable `app.ini` is found, secret checks are reported as unknown (`null`), not missing.
 
 ```sh
