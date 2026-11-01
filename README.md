@@ -10,7 +10,7 @@ Early prototype. The product hypothesis is that small teams and MSPs running For
 
 ## Current MVP
 
-The local CLI inventories backup archives without extracting or executing them, highlights missing database/repository/storage/config candidates, optionally checks ZIP entry CRCs, and saves a redacted report with a UTC timestamp and schema version. A later milestone may run a restore in an isolated disposable environment; it must never target production.
+The local CLI inventories backup archives and standalone SQL dump files without extracting or executing them, highlights missing database/repository/storage/config candidates, optionally checks ZIP entry CRCs, and saves a redacted report with a UTC timestamp and schema version. A later milestone may run a restore in an isolated disposable environment; it must never target production.
 
 ## Why this problem
 
@@ -41,7 +41,7 @@ forgejo-recovery-check --help
 
 The CLI uses only the Python standard library. This installs the current repository version; it is not a versioned PyPI release.
 
-The preflight inventories archive names and reads up to 1 MiB from `app.ini` to check whether the two documented secret settings are configured. It also reports the non-secret `[database].DB_TYPE` value so operators can select an appropriate recovery recipe. It distinguishes SQLite files from SQL dumps, recognizes repository and storage entries, and reports whether core candidates appear present. It does not extract archives or print secret values. If no inspectable `app.ini` is found, secret checks are reported as unknown (`null`), not missing.
+The preflight inventories archive members and standalone `.sql`, `.sql.gz`, or `.dump` filenames and reads up to 1 MiB from `app.ini` to check whether the two documented secret settings are configured. It also reports the non-secret `[database].DB_TYPE` value so operators can select an appropriate recovery recipe. It distinguishes SQLite files from SQL dumps, recognizes repository and storage entries, and reports whether core candidates appear present. Standalone SQL inputs are identified by filename only; they are not parsed, decompressed, or loaded into a database. The tool does not extract archives or print secret values. If no inspectable `app.ini` is found, secret checks are reported as unknown (`null`), not missing.
 
 ```sh
 python3 forgejo_recovery_check.py backup.tar.gz database.sql.gz --report recovery-report.json

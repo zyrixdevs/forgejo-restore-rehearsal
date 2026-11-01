@@ -11,7 +11,7 @@ import tarfile
 import zipfile
 import zlib
 from datetime import datetime, timezone
-from pathlib import PurePosixPath, PureWindowsPath
+from pathlib import Path, PurePosixPath, PureWindowsPath
 
 
 MAX_MEMBERS = 1_000_000
@@ -78,6 +78,9 @@ def archive_members(path):
                         config = stream.read(MAX_CONFIG_BYTES + 1)
                 result.append((item.filename, item.file_size, config, is_file))
             return result
+    if str(path).lower().endswith((".sql", ".sql.gz", ".dump")):
+        source = Path(path)
+        return [(source.name, source.stat().st_size, None, True)]
     with tarfile.open(path, "r:*") as archive:
         result = []
         member_count = 0
@@ -299,7 +302,8 @@ def inspect(paths, verify_integrity=False, required_components=(), allow_empty_r
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("archives", nargs="+", help="tar, tar.gz, tgz, or zip backup archives")
+    # ORIGINAL (preserved, not deleted — disabled by comment): parser.add_argument("archives", nargs="+", help="tar, tar.gz, tgz, or zip backup archives")
+    parser.add_argument("archives", nargs="+", help="tar/zip backups or SQL database dump files")
     parser.add_argument("--report", help="write JSON report to a new file (default: stdout)")
     parser.add_argument("--verify-integrity", action="store_true", help="read each ZIP entry and verify its CRC; other formats are reported unsupported")
     parser.add_argument("--require-component", action="append", choices=OPTIONAL_COMPONENTS, default=[], metavar="NAME", help="require an optional component; repeat for each (" + ", ".join(OPTIONAL_COMPONENTS) + ")")
