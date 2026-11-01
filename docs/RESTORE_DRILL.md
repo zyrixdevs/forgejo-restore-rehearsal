@@ -17,6 +17,7 @@ Use a customer-controlled environment where possible. Do not upload backups or r
 - Do not reuse production credentials or point the sandbox at production databases, Redis, object storage, DNS, or SMTP.
 - Match the Forgejo version and database engine used by the selected backup where practical. Record any mismatch.
 - Start with an empty restore target. Never restore into a production data directory. Never use destructive restore options against a live target.
+- Do not assume a generic Restorable `docker-app` check blocks outbound traffic: its current container setup publishes the probe on localhost but does not set an egress-restricted network. Apply host/network egress controls separately before booting Forgejo, or do not run the application check. See [Restorable's container setup](https://github.com/restorable-dev/restorable/blob/main/agent/internal/sandbox/docker.go).
 
 If isolation cannot be demonstrated, stop before restoring or starting Forgejo.
 

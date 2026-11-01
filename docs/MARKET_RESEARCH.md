@@ -68,3 +68,4 @@ Keep the preflight and Restorable recipes open source. Test a one-time, customer
 - Archive layouts are operator-specific; heuristics can produce false positives and false negatives.
 - A preflight cannot prove a successful application restore; only an isolated end-to-end rehearsal can.
 - Restore environments may contain sensitive source code, secrets, and personal data; no hosted handling is planned.
+- Restorable's current `docker-app` container setup does not enforce egress isolation. A Forgejo application-boot check needs operator/network controls beyond the recipe before it can be part of a safe paid drill. [Container setup](https://github.com/restorable-dev/restorable/blob/main/agent/internal/sandbox/docker.go)
