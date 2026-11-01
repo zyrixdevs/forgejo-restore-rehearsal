@@ -26,6 +26,8 @@ For a Restic snapshot, select the agreed snapshot and restore it into the dispos
 
 For the default `WORK_PATH` plus local SQLite layout, run the [Forgejo Restorable recipe](../integrations/restorable/forgejo.yaml) against that snapshot. It checks the expected config and database paths, samples restored file checksums, and runs SQLite integrity validation. It does not verify custom layouts, PostgreSQL, external object storage, full application startup, or semantic correctness of issues and repositories.
 
+If a MariaDB/MySQL dump is included in the snapshot, the [MariaDB recipe](../integrations/restorable/forgejo-mysql.yaml) loads it into a throwaway MariaDB container and checks that at least one `user` row exists. The dump must be copied into the selected Restic snapshot and its recipe path adjusted; the recipe does not validate Forgejo startup or the rest of the application state.
+
 For a native Forgejo dump, use the local inventory CLI first:
 
 ```sh
