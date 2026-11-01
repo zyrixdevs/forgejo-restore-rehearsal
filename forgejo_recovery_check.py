@@ -29,11 +29,12 @@ def archive_members(path):
                 result.append((item.filename, item.file_size, config))
             return result
     with tarfile.open(path, "r:*") as archive:
-        members = archive.getmembers()
-        if len(members) > MAX_MEMBERS:
-            raise ValueError(f"too many archive entries (limit {MAX_MEMBERS})")
         result = []
-        for item in members:
+        member_count = 0
+        for item in archive:
+            if member_count >= MAX_MEMBERS:
+                raise ValueError(f"too many archive entries (limit {MAX_MEMBERS})")
+            member_count += 1
             if not item.isfile():
                 continue
             config = None
@@ -51,7 +52,10 @@ def inspect(paths):
     config_files = []
     app_ini_found = False
     for path in paths:
-        for name, _size, config_bytes in archive_members(path):
+        members = archive_members(path)
+        if len(names) + len(members) > MAX_MEMBERS:
+            raise ValueError(f"too many archive entries across inputs (limit {MAX_MEMBERS})")
+        for name, _size, config_bytes in members:
             normalized = str(PurePosixPath(name)).lower()
             names.append(normalized)
             app_ini_found |= PurePosixPath(normalized).name == "app.ini"
@@ -69,7 +73,10 @@ def inspect(paths):
         part in {"storage", "attachments", "lfs", "avatars", "repo-avatars", "packages"}
         for name in names for part in PurePosixPath(name).parts
     )
-    config = {"secret_key_configured": False, "oauth_jwt_secret_configured": False}
+    config = {"secret_key_configured": None, "oauth_jwt_secret_configured": None}
+    if config_files:
+        config["secret_key_configured"] = False
+        config["oauth_jwt_secret_configured"] = False
     for config_bytes in config_files:
         parser = configparser.ConfigParser(interpolation=None)
         parser.read_string(config_bytes.decode("utf-8", errors="replace"))
@@ -89,6 +96,7 @@ def inspect(paths):
         "default_repository_directory_found": repositories,
         "common_storage_directory_found": storage,
         "app_ini_found": app_ini_found,
+        "app_ini_settings_inspected": bool(config_files),
         "secret_key_configured_in_app_ini": config["secret_key_configured"],
         "oauth_jwt_secret_configured_in_app_ini": config["oauth_jwt_secret_configured"],
         "limitations": [

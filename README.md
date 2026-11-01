@@ -30,7 +30,7 @@ Keep the recovery runner open source. If discovery confirms a recurring pain, te
 
 ## Development
 
-The preflight only inventories archive names and reads up to 1 MiB from `app.ini` to check whether the two documented secret settings are configured. It does not extract archives or print setting values.
+The preflight only inventories archive names and reads up to 1 MiB from `app.ini` to check whether the two documented secret settings are configured. It does not extract archives or print setting values. If no inspectable `app.ini` is found, those checks are reported as unknown (`null`), not missing.
 
 ```sh
 python3 forgejo_recovery_check.py backup.tar.gz database.sql.gz --report recovery-report.json
