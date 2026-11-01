@@ -4,10 +4,12 @@
 import argparse
 import configparser
 import json
+import lzma
 import stat
 import sys
 import tarfile
 import zipfile
+import zlib
 from pathlib import PurePosixPath
 
 
@@ -180,7 +182,7 @@ def main():
         if args.verify_integrity and any(status != "passed" for status in report["zip_crc_checks_in_input_order"]):
             return 1
         return 0
-    except (OSError, EOFError, RuntimeError, tarfile.TarError, zipfile.BadZipFile, ValueError, configparser.Error) as error:
+    except (OSError, EOFError, RuntimeError, lzma.LZMAError, zlib.error, tarfile.TarError, zipfile.BadZipFile, ValueError, configparser.Error) as error:
         parser.error(str(error))
 
 
