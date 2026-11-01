@@ -10,7 +10,7 @@ Early prototype. The product hypothesis is that small teams and MSPs running For
 
 ## Current MVP
 
-The local CLI inventories backup archives without extracting or executing them, highlights missing database/repository/storage/config candidates, optionally checks ZIP entry CRCs, and saves a redacted report. A later milestone may run a restore in an isolated disposable environment; it must never target production.
+The local CLI inventories backup archives without extracting or executing them, highlights missing database/repository/storage/config candidates, optionally checks ZIP entry CRCs, and saves a redacted report with a UTC timestamp and schema version. A later milestone may run a restore in an isolated disposable environment; it must never target production.
 
 ## Why this problem
 
@@ -28,7 +28,7 @@ An operator in a public DevOps discussion reported discovering that months of ni
 
 ## Business hypothesis
 
-Keep the native-dump checker open source. The candidate buyer is an MSP or small organization that must demonstrate recovery readiness for a Forgejo instance. A possible paid offer is a supervised isolated restore drill with an evidence report, sold per instance or as an annual service. Pricing and Forgejo-specific willingness to pay are unknown; general restore assurance is competitive, so this is only a hypothesis.
+Keep the native-dump checker and Restorable recipe open source. The candidate buyer is an MSP managing several Forgejo instances. The paid hypothesis is setup/support and supervised restore drills using an existing isolated runner, sold per drill; pricing and Forgejo-specific willingness to pay are unknown. General restore assurance is competitive, so this remains unvalidated.
 
 ## Development
 

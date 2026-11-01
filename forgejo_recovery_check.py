@@ -10,6 +10,7 @@ import sys
 import tarfile
 import zipfile
 import zlib
+from datetime import datetime, timezone
 from pathlib import PurePosixPath
 
 
@@ -188,6 +189,8 @@ def inspect(paths, verify_integrity=False, required_components=(), allow_empty_r
     ]
 
     return {
+        "report_schema_version": 1,
+        "generated_at_utc": datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z"),
         "archive_count": len(paths),
         "entry_count": len(names),
         "zip_crc_checks_in_input_order": integrity_checks,
