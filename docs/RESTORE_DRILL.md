@@ -52,6 +52,8 @@ Do not trigger real Actions workflows, outbound webhooks, email, mirrors, or OAu
 
 Give the customer a private report containing the snapshot identifier/recovery point, target RTO/RPO if the customer has defined them, tested Forgejo/database versions, deployment assumptions, checks performed, pass/fail/unknown results, end-to-end elapsed time, any manual fixes, and uncovered dependencies. Record target and observed values separately; a drill does not create a contractual recovery objective. Do not include backup contents, secrets, repository names, user data, or raw `app.ini` values. Mark a check `unknown` when it was not authorized or could not be isolated.
 
+Use the [report template](REPORT_TEMPLATE.md) and retain the completed copy only in customer-approved storage. Do not commit a customer report to this repository.
+
 After the customer confirms the report is retained, destroy the disposable VM, restored volumes, temporary credentials, and working copies according to the customer's retention policy. Record what was destroyed. If cleanup cannot be verified, disclose that in the report.
 
 ## Drill outcome

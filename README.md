@@ -66,7 +66,7 @@ Archive entries with absolute paths or parent-directory traversal are excluded f
 
 For Restic snapshots with the default local SQLite database, [`integrations/restorable/forgejo.yaml`](integrations/restorable/forgejo.yaml) checks Forgejo's default `WORK_PATH` paths and runs SQLite integrity validation. For a snapshot that also contains an exported PostgreSQL dump, [`integrations/restorable/forgejo-postgres.yaml`](integrations/restorable/forgejo-postgres.yaml) loads it into Restorable's throwaway PostgreSQL container. Edit the paths in either recipe to match your snapshot, then copy the selected recipe into the directory referenced by Restorable's `agent.yaml` `recipes` setting. Neither recipe starts Forgejo or checks external object storage. See [Restorable's recipe guide](https://github.com/restorable-dev/restorable#check-types).
 
-For a customer-authorized, manually supervised full restore rehearsal, see the [recovery drill runbook](docs/RESTORE_DRILL.md). The procedure is not automated or yet validated against a real Forgejo backup.
+For a customer-authorized, manually supervised full restore rehearsal, see the [recovery drill runbook](docs/RESTORE_DRILL.md) and [private report template](docs/REPORT_TEMPLATE.md). The procedure is not automated or yet validated against a real Forgejo backup.
 
 ## License
 
