@@ -8,9 +8,9 @@ Forgejo stores state across a database, Git repositories, files, and configurati
 
 Early prototype. The product hypothesis is that small teams and MSPs running Forgejo want an easier, repeatable way to rehearse recovery and retain evidence. This has not been validated with customers, and no revenue exists.
 
-## First milestone
+## Current MVP
 
-Build a local preflight that inspects backup archive inventories without extracting or executing them, highlights missing database/repository/storage/config pieces, and saves a redacted report. A later milestone may run a restore in an isolated disposable environment; it must never target production.
+The local CLI inventories backup archives without extracting or executing them, highlights missing database/repository/storage/config candidates, optionally checks ZIP entry CRCs, and saves a redacted report. A later milestone may run a restore in an isolated disposable environment; it must never target production.
 
 ## Why this problem
 
@@ -22,11 +22,11 @@ Forgejo's administrator guide says backups span multiple data locations and rest
 - Does not extract untrusted archives in the preflight milestone.
 - Does not print configuration values or secret material.
 - A complete-looking archive is not proof that it can be restored.
-- No automated restore, hosted service, pricing, or sales claims yet.
+- No automated restore or hosted service yet.
 
 ## Business hypothesis
 
-Keep the recovery runner open source. If discovery confirms a recurring pain, test paid supervised recovery drills and evidence reports for organizations operating Forgejo. Generic restore assurance is competitive, Forgejo-specific willingness to pay is unknown, and this is only a hypothesis.
+Keep the recovery runner open source. The candidate buyer is an MSP or small organization that must demonstrate recovery readiness for a Forgejo instance. A possible paid offer is a scheduled, supervised isolated restore drill with an evidence report, sold per instance or as an annual service. Pricing and Forgejo-specific willingness to pay are unknown; generic restore assurance is competitive, so this is only a hypothesis.
 
 ## Development
 
