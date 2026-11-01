@@ -16,7 +16,8 @@ Copy this template to customer-controlled storage for each authorized review. Do
 - Recovery point timestamp: `[if known]`
 - Target Forgejo version: `[version]`
 - Observed backup Forgejo version: `[version | unknown]`
-- Database engine/version: `[engine/version | unknown]`
+- Database type configured in archived `app.ini`: `[mysql/postgres/sqlite3/unset/mixed/unknown]`
+- Effective database engine/version observed in the restored instance: `[engine/version | unknown]`
 - Restore environment: `[customer-controlled isolated environment description]`
 - Isolation and outbound-network controls confirmed: `[yes/no/unknown; explain briefly]`
 - External dependencies in scope: `[service categories only, no endpoints or credentials]`
