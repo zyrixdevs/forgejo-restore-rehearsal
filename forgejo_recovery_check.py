@@ -4,6 +4,7 @@
 import argparse
 import configparser
 import json
+import stat
 import sys
 import tarfile
 import zipfile
@@ -33,11 +34,17 @@ def archive_members(path):
                 raise ValueError(f"too many archive entries (limit {MAX_MEMBERS})")
             result = []
             for item in infos:
+                mode = item.external_attr >> 16
+                is_dir = item.is_dir() or stat.S_ISDIR(mode)
+                file_type = stat.S_IFMT(mode)
+                is_file = not is_dir and file_type in {0, stat.S_IFREG}
+                if not (is_dir or is_file):
+                    continue
                 config = None
-                if PurePosixPath(item.filename.replace("\\", "/")).name.lower() == "app.ini" and item.file_size <= MAX_CONFIG_BYTES:
+                if is_file and PurePosixPath(item.filename.replace("\\", "/")).name.lower() == "app.ini" and item.file_size <= MAX_CONFIG_BYTES:
                     with archive.open(item) as stream:
                         config = stream.read(MAX_CONFIG_BYTES + 1)
-                result.append((item.filename, item.file_size, config))
+                result.append((item.filename, item.file_size, config, is_file))
             return result
     with tarfile.open(path, "r:*") as archive:
         result = []
@@ -54,13 +61,14 @@ def archive_members(path):
                 if stream:
                     with stream:
                         config = stream.read(MAX_CONFIG_BYTES + 1)
-            result.append((item.name, item.size, config))
+            result.append((item.name, item.size, config, item.isfile()))
         return result
 
 
 def inspect(paths, verify_integrity=False, required_components=()):
     names = []
     config_files = []
+    file_names = []
     app_ini_found = False
     integrity_checks = []
     for path in paths:
@@ -75,15 +83,17 @@ def inspect(paths, verify_integrity=False, required_components=()):
         members = archive_members(path)
         if len(names) + len(members) > MAX_MEMBERS:
             raise ValueError(f"too many archive entries across inputs (limit {MAX_MEMBERS})")
-        for name, _size, config_bytes in members:
+        for name, _size, config_bytes, is_file in members:
             normalized = str(PurePosixPath(name.replace("\\", "/"))).lower()
             names.append(normalized)
-            app_ini_found |= PurePosixPath(normalized).name == "app.ini"
+            if is_file:
+                file_names.append(normalized)
+                app_ini_found |= PurePosixPath(normalized).name == "app.ini"
             if config_bytes is not None:
                 if len(config_bytes) <= MAX_CONFIG_BYTES:
                     config_files.append(config_bytes)
 
-    basenames = [PurePosixPath(name).name for name in names]
+    basenames = [PurePosixPath(name).name for name in file_names]
     database_candidates = {
         "sqlite_file": any(name in {"forgejo.db", "gitea.db"} or name.endswith(".sqlite3") for name in basenames),
         "sql_dump": any(name.endswith((".sql", ".sql.gz", ".dump")) for name in basenames),
