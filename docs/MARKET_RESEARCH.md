@@ -1,0 +1,27 @@
+# Market research
+
+Research date: 2026-11-01. Desk research only; no user interviews or purchase evidence.
+
+## Problem evidence
+
+Forgejo says it does not provide or recommend one backup tool. Even the simplest setup stores repositories and bulk files on disk and user interaction data in SQL, and a consistent backup while Forgejo is running is not trivial. Restoring requires coordinating the database, files, configuration, and startup. Its guide identifies `[security].SECRET_KEY` as essential to decrypt stored webhook, Actions, mirror, and two-factor credentials; losing the OAuth JWT secret can require integrations to reauthenticate. [Official Forgejo guide](https://forgejo.org/docs/v17.0/admin/setup/backup/)
+
+These facts establish operational complexity, not buyer demand.
+
+## Adjacent alternatives
+
+Generic app-aware restore verification is already a product category. [Restorable](https://restorable.dev/) documents real restores in disposable sandboxes, app-aware checks, and recipes for Nextcloud, Vaultwarden, and Immich. [RestoreProof](https://restoreproof.io/) markets disposable restore checks and reports for databases and applications. This overlaps the core promise; Forgejo-specific demand and a distinct advantage are not established.
+
+A [Forgejo community thread](https://www.reddit.com/r/forgejo/comments/1o9e16d) asks about automatically validating backups. This is one operator's question, not evidence of broad demand or buying intent.
+
+## Hypothesis to validate
+
+Offer a free local recovery preflight and rehearsal runner. If organizations repeatedly need help proving Forgejo recoverability, test a paid supervised drill and evidence report. Before building hosted scheduling or restore orchestration, seek five operator interviews, two supervised pilots, and one explicit paid-pilot commitment. These are proposed gates, not achievements.
+
+## Risks and unknowns
+
+- No Forgejo-specific willingness-to-pay signal found yet.
+- Existing backup scripts and generic restore-verification products may be sufficient.
+- Archive layouts are operator-specific; heuristics can produce false positives and false negatives.
+- A preflight cannot prove a successful application restore; only an isolated end-to-end rehearsal can.
+- Restore environments may contain sensitive source code, secrets, and personal data; no hosted handling is planned.
