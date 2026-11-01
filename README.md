@@ -28,7 +28,7 @@ An operator in a public DevOps discussion reported discovering that months of ni
 
 ## Business hypothesis
 
-Keep the native-dump checker and Restorable recipes open source. The first paid offer to test is a one-time, customer-controlled Forgejo recovery-evidence review through self-hosting MSPs, including a private report and an authorized isolated restore drill where feasible. A generic MSP publishes restore tests at $395, which is only a price anchor for interviews, not our validated price. No Forgejo buyer demand or sales are validated; see [`docs/MARKET_RESEARCH.md`](docs/MARKET_RESEARCH.md).
+Keep the native-dump checker and Restorable recipes open source. The paid offer to test is a one-time, customer-controlled Forgejo recovery-evidence review through self-hosting MSPs, with a private report from a full isolated restore and agreed application checks. Do not charge for the current inventory-only preflight as proof of recoverability. A generic MSP publishes restore tests at $395, which is only a price anchor for interviews, not our validated price. No Forgejo buyer demand or sales are validated; see [`docs/MARKET_RESEARCH.md`](docs/MARKET_RESEARCH.md).
 
 ## Development
 

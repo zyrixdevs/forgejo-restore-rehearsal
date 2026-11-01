@@ -20,6 +20,7 @@ Interview self-hosters and small organizations that administer their own Forgejo
 10. What private evidence can you show that the last restore test covered the same backup source, Forgejo version, database, repositories, and external storage you depend on?
 11. Do you test every instance or rotate samples by recovery priority? How do you record the snapshot tested, the actual elapsed recovery time, manual fixes, and application-owner sign-off?
 12. If an MSP offered a one-time Forgejo recovery-evidence review with an isolated restore drill and private report, who would buy it, what would it need to cover, and would a $395 starting price be reasonable or should this be included in an existing agreement?
+13. Can your current checks detect an empty or unusable database dump when the backup command exits successfully? What content-level or application-level check do you trust, and what does it cost to maintain?
 
 Ask for a recent concrete example. Do not pitch the product before collecting the current workflow.
 
