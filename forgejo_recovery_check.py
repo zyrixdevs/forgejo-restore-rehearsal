@@ -105,6 +105,7 @@ def inspect(paths, verify_integrity=False, required_components=(), allow_empty_r
     app_ini_found = False
     unsafe_archive_paths_ignored = 0
     integrity_checks = []
+    per_archive_core_components = []
     for path in paths:
         if verify_integrity:
             if zipfile.is_zipfile(path):
@@ -117,20 +118,46 @@ def inspect(paths, verify_integrity=False, required_components=(), allow_empty_r
         members = archive_members(path)
         if len(names) + len(members) > MAX_MEMBERS:
             raise ValueError(f"too many archive entries across inputs (limit {MAX_MEMBERS})")
+        archive_safe_names = []
+        archive_file_names = []
+        archive_app_ini_found = False
         for name, _size, config_bytes, is_file in members:
             normalized = str(PurePosixPath(name.replace("\\", "/"))).lower()
             names.append(normalized)
             is_safe_path = safe_member_path(name)
             if is_safe_path:
                 safe_names.append(normalized)
+                archive_safe_names.append(normalized)
             else:
                 unsafe_archive_paths_ignored += 1
             if is_file and is_safe_path:
                 file_names.append(normalized)
-                app_ini_found |= PurePosixPath(normalized).name == "app.ini"
+                archive_file_names.append(normalized)
+                # ORIGINAL (preserved, not deleted — disabled by comment): app_ini_found |= PurePosixPath(normalized).name == "app.ini"
+                if PurePosixPath(normalized).name == "app.ini":
+                    app_ini_found = True
+                    archive_app_ini_found = True
             if config_bytes is not None and is_safe_path:
                 if len(config_bytes) <= MAX_CONFIG_BYTES:
                     config_files.append(config_bytes)
+        archive_basenames = [PurePosixPath(name).name for name in archive_file_names]
+        archive_has_database = any(
+            name in {"forgejo.db", "gitea.db"} or name.endswith(".sqlite3")
+            or name.endswith((".sql", ".sql.gz", ".dump"))
+            for name in archive_basenames
+        )
+        archive_has_repositories = any(
+            part in {"repos", "forgejo-repositories"}
+            for name in archive_safe_names for part in PurePosixPath(name).parts
+        )
+        per_archive_core_components.append({
+            "archive_index": len(per_archive_core_components) + 1,
+            "core_components": {
+                "database": archive_has_database,
+                "app_ini": archive_app_ini_found,
+                "repository_data": archive_has_repositories,
+            },
+        })
 
     basenames = [PurePosixPath(name).name for name in file_names]
     database_candidates = {
@@ -227,6 +254,7 @@ def inspect(paths, verify_integrity=False, required_components=(), allow_empty_r
         "unsafe_archive_paths_ignored": unsafe_archive_paths_ignored,
         "zip_crc_checks_in_input_order": integrity_checks,
         "core_components": core_components,
+        "per_archive_core_components": per_archive_core_components,
         "core_components_look_present": core_components_look_present,
         "waived_core_components": waived_core_components,
         "database_candidates": database_candidates,

@@ -58,6 +58,8 @@ This checks ZIP entry integrity only; it does not prove database consistency or 
 
 The report lists likely presence for attachments, LFS, avatars, repository avatars/archives, packages, Actions data, and custom files. It also reads `STORAGE_TYPE` values from `app.ini` and identifies components configured for MinIO/S3; it cannot verify that the external object store was backed up. When Forgejo's built-in SSH server is enabled, it reports whether the configured host-key filenames appear in the archive. It flags Redis queues, external search indexers, and configured path-setting names for separate recovery planning. Path values are not printed; a listed setting still needs comparison with the archive layout. These are configuration-derived warnings, not proof the dependencies were backed up. Required optional components must be chosen by the operator. Custom local paths, external secret files, database validity, consistency, and application behavior are not verified. Read [`docs/MARKET_RESEARCH.md`](docs/MARKET_RESEARCH.md) before treating this as a product direction.
 
+When multiple archives are supplied, the top-level component summary combines their entries. `per_archive_core_components` in the JSON report keeps the same core checks separate by input order, so a database in one archive and repositories in another are not mistaken for a single archive containing both. The report intentionally omits archive filenames.
+
 Archive entries with absolute paths or parent-directory traversal are excluded from recovery-candidate checks and counted in `unsafe_archive_paths_ignored`; they are never extracted.
 
 ## Restic restore checks
