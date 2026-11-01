@@ -12,6 +12,17 @@ from pathlib import PurePosixPath
 
 MAX_MEMBERS = 1_000_000
 MAX_CONFIG_BYTES = 1_048_576
+OPTIONAL_COMPONENTS = {
+    "attachments": "attachments",
+    "lfs": "lfs",
+    "avatars": "avatars",
+    "repository_avatars": "repo-avatars",
+    "repository_archives": "repo-archive",
+    "packages": "packages",
+    "actions_logs": "actions_log",
+    "actions_artifacts": "actions_artifacts",
+    "custom": "custom",
+}
 
 
 def archive_members(path):
@@ -47,7 +58,7 @@ def archive_members(path):
         return result
 
 
-def inspect(paths, verify_integrity=False):
+def inspect(paths, verify_integrity=False, required_components=()):
     names = []
     config_files = []
     app_ini_found = False
@@ -81,13 +92,11 @@ def inspect(paths, verify_integrity=False):
         part in {"repos", "forgejo-repositories"}
         for name in names for part in PurePosixPath(name).parts
     )
-    storage = any(
-        part in {
-            "storage", "attachments", "lfs", "avatars", "repo-avatars", "repo-archive",
-            "packages", "actions_log", "actions_artifacts",
-        }
-        for name in names for part in PurePosixPath(name).parts
-    )
+    optional_components = {
+        component: any(path in PurePosixPath(name).parts for name in names)
+        for component, path in OPTIONAL_COMPONENTS.items()
+    }
+    storage = any(optional_components.values())
     config = {"secret_key_configured": None, "oauth_jwt_secret_configured": None}
     if config_files:
         config["secret_key_configured"] = False
@@ -109,6 +118,9 @@ def inspect(paths, verify_integrity=False):
         "app_ini": app_ini_found,
         "repository_data": repositories,
     }
+    missing_required_components = [
+        component for component in required_components if not optional_components[component]
+    ]
 
     return {
         "archive_count": len(paths),
@@ -116,6 +128,9 @@ def inspect(paths, verify_integrity=False):
         "zip_crc_checks_in_input_order": integrity_checks,
         "core_components": core_components,
         "core_components_look_present": all(core_components.values()),
+        "optional_component_candidates": optional_components,
+        "required_optional_components": list(required_components),
+        "missing_required_optional_components": missing_required_components,
         "database_candidate_found": database,
         "repository_data_candidate_found": repositories,
         "common_storage_data_candidate_found": storage,
@@ -136,9 +151,10 @@ def main():
     parser.add_argument("archives", nargs="+", help="tar, tar.gz, tgz, or zip backup archives")
     parser.add_argument("--report", help="write JSON report to a new file (default: stdout)")
     parser.add_argument("--verify-integrity", action="store_true", help="read each ZIP entry and verify its CRC; other formats are reported unsupported")
+    parser.add_argument("--require-component", action="append", choices=OPTIONAL_COMPONENTS, default=[], metavar="NAME", help="require an optional component; repeat for each (" + ", ".join(OPTIONAL_COMPONENTS) + ")")
     args = parser.parse_args()
     try:
-        report = inspect(args.archives, args.verify_integrity)
+        report = inspect(args.archives, args.verify_integrity, args.require_component)
         payload = json.dumps(report, indent=2) + "\n"
         if args.report:
             with open(args.report, "x", encoding="utf-8") as output:
@@ -146,6 +162,8 @@ def main():
         else:
             sys.stdout.write(payload)
         if not report["core_components_look_present"]:
+            return 1
+        if report["missing_required_optional_components"]:
             return 1
         if args.verify_integrity and any(status != "passed" for status in report["zip_crc_checks_in_input_order"]):
             return 1
