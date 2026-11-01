@@ -23,7 +23,7 @@ def archive_members(path):
             result = []
             for item in infos:
                 config = None
-                if PurePosixPath(item.filename).name.lower() == "app.ini" and item.file_size <= MAX_CONFIG_BYTES:
+                if PurePosixPath(item.filename.replace("\\", "/")).name.lower() == "app.ini" and item.file_size <= MAX_CONFIG_BYTES:
                     with archive.open(item) as stream:
                         config = stream.read(MAX_CONFIG_BYTES + 1)
                 result.append((item.filename, item.file_size, config))
@@ -35,10 +35,10 @@ def archive_members(path):
             if member_count >= MAX_MEMBERS:
                 raise ValueError(f"too many archive entries (limit {MAX_MEMBERS})")
             member_count += 1
-            if not item.isfile():
+            if not (item.isfile() or item.isdir()):
                 continue
             config = None
-            if PurePosixPath(item.name).name.lower() == "app.ini" and item.size <= MAX_CONFIG_BYTES:
+            if item.isfile() and PurePosixPath(item.name.replace("\\", "/")).name.lower() == "app.ini" and item.size <= MAX_CONFIG_BYTES:
                 stream = archive.extractfile(item)
                 if stream:
                     with stream:
@@ -56,7 +56,7 @@ def inspect(paths):
         if len(names) + len(members) > MAX_MEMBERS:
             raise ValueError(f"too many archive entries across inputs (limit {MAX_MEMBERS})")
         for name, _size, config_bytes in members:
-            normalized = str(PurePosixPath(name)).lower()
+            normalized = str(PurePosixPath(name.replace("\\", "/"))).lower()
             names.append(normalized)
             app_ini_found |= PurePosixPath(normalized).name == "app.ini"
             if config_bytes is not None:
@@ -134,7 +134,7 @@ def main():
                 output.write(payload)
         else:
             sys.stdout.write(payload)
-    except (OSError, tarfile.TarError, zipfile.BadZipFile, ValueError, configparser.Error) as error:
+    except (OSError, EOFError, RuntimeError, tarfile.TarError, zipfile.BadZipFile, ValueError, configparser.Error) as error:
         parser.error(str(error))
 
 

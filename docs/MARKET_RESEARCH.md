@@ -14,6 +14,8 @@ These facts establish operational complexity, not buyer demand.
 
 Generic app-aware restore verification is already a product category. [Restorable](https://restorable.dev/) documents real restores in disposable sandboxes, app-aware checks, and recipes for Nextcloud, Vaultwarden, and Immich. [RestoreProof](https://restoreproof.io/) markets disposable restore checks and reports for databases and applications. This overlaps the core promise; Forgejo-specific demand and a distinct advantage are not established.
 
+RestoreProof currently lists €49/month and €249/month plans, including scheduled runs and report history; Restorable describes its cloud dashboard as free during open beta and lists an $8/month Pro plan. These prices show adjacent category pricing, not Forgejo demand, sales, or a viable price for this product.
+
 A [Forgejo community thread](https://www.reddit.com/r/forgejo/comments/1o9e16d) asks about automatically validating backups. This is one operator's question, not evidence of broad demand or buying intent.
 
 ## Hypothesis to validate
@@ -24,6 +26,7 @@ Offer a free local recovery preflight and rehearsal runner. If organizations rep
 
 - No Forgejo-specific willingness-to-pay signal found yet.
 - Existing backup scripts and generic restore-verification products may be sufficient.
+- Adjacent vendors already have pricing and broad product coverage; the local preflight alone has no clear paid differentiation.
 - Archive layouts are operator-specific; heuristics can produce false positives and false negatives.
 - A preflight cannot prove a successful application restore; only an isolated end-to-end rehearsal can.
 - Restore environments may contain sensitive source code, secrets, and personal data; no hosted handling is planned.
