@@ -11,7 +11,7 @@ import tarfile
 import zipfile
 import zlib
 from datetime import datetime, timezone
-from pathlib import PurePosixPath
+from pathlib import PurePosixPath, PureWindowsPath
 
 
 MAX_MEMBERS = 1_000_000
@@ -37,6 +37,17 @@ STORAGE_SECTIONS = {
     "actions_logs": "storage.actions_log",
     "actions_artifacts": "actions.artifacts",
 }
+
+
+def safe_member_path(name):
+    normalized = name.replace("\\", "/")
+    posix_path = PurePosixPath(normalized)
+    windows_path = PureWindowsPath(normalized)
+    return (
+        not posix_path.is_absolute()
+        and not windows_path.drive
+        and ".." not in posix_path.parts
+    )
 
 
 def archive_members(path):
@@ -80,9 +91,11 @@ def archive_members(path):
 
 def inspect(paths, verify_integrity=False, required_components=(), allow_empty_repositories=False):
     names = []
+    safe_names = []
     config_files = []
     file_names = []
     app_ini_found = False
+    unsafe_archive_paths_ignored = 0
     integrity_checks = []
     for path in paths:
         if verify_integrity:
@@ -99,10 +112,15 @@ def inspect(paths, verify_integrity=False, required_components=(), allow_empty_r
         for name, _size, config_bytes, is_file in members:
             normalized = str(PurePosixPath(name.replace("\\", "/"))).lower()
             names.append(normalized)
-            if is_file:
+            is_safe_path = safe_member_path(name)
+            if is_safe_path:
+                safe_names.append(normalized)
+            else:
+                unsafe_archive_paths_ignored += 1
+            if is_file and is_safe_path:
                 file_names.append(normalized)
                 app_ini_found |= PurePosixPath(normalized).name == "app.ini"
-            if config_bytes is not None:
+            if config_bytes is not None and is_safe_path:
                 if len(config_bytes) <= MAX_CONFIG_BYTES:
                     config_files.append(config_bytes)
 
@@ -114,10 +132,10 @@ def inspect(paths, verify_integrity=False, required_components=(), allow_empty_r
     database = any(database_candidates.values())
     repositories = any(
         part in {"repos", "forgejo-repositories"}
-        for name in names for part in PurePosixPath(name).parts
+        for name in safe_names for part in PurePosixPath(name).parts
     )
     optional_components = {
-        component: any(path in PurePosixPath(name).parts for name in names)
+        component: any(path in PurePosixPath(name).parts for name in safe_names)
         for component, path in OPTIONAL_COMPONENTS.items()
     }
     storage = any(optional_components.values())
@@ -193,6 +211,7 @@ def inspect(paths, verify_integrity=False, required_components=(), allow_empty_r
         "generated_at_utc": datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z"),
         "archive_count": len(paths),
         "entry_count": len(names),
+        "unsafe_archive_paths_ignored": unsafe_archive_paths_ignored,
         "zip_crc_checks_in_input_order": integrity_checks,
         "core_components": core_components,
         "core_components_look_present": core_components_look_present,
@@ -220,6 +239,7 @@ def inspect(paths, verify_integrity=False, required_components=(), allow_empty_r
         "limitations": [
             "Checks archive names and selected app.ini settings only; it does not validate database contents, every configured path, or file integrity.",
             "Custom repository/storage paths and secrets stored in external files need operator review.",
+            "Absolute archive paths and paths containing parent-directory traversal are ignored as recovery candidates.",
             "SSH host-key checks match basenames only and may not reflect custom APP_DATA_PATH layouts.",
             "A passing inventory is not a restore test or proof of recoverability.",
         ],
