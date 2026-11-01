@@ -13,6 +13,8 @@ Interview self-hosters and small organizations that administer their own Forgejo
 3. How did you verify that repositories, issues, attachments, Actions secrets, and integrations worked after recovery?
 4. What did the recovery or rehearsal cost in staff time, downtime, or risk?
 5. What do you use now, and what would make you switch or add a tool?
+6. Have you considered or built a disposable restore test? What does it fail to cover compared with your actual backup and deployment?
+7. Who owns the recovery evidence, and when did they last pay for a restore drill, MSP support, or audit evidence? What budget and purchase process applied?
 
 Ask for a recent concrete example. Do not pitch the product before collecting the current workflow.
 
