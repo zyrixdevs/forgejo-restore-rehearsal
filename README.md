@@ -51,7 +51,7 @@ The report lists likely presence for attachments, LFS, avatars, repository avata
 
 ## Restic restore checks
 
-If Restic backs up Forgejo's `WORK_PATH` and the instance uses the default SQLite database, [`integrations/restorable/forgejo.yaml`](integrations/restorable/forgejo.yaml) adds a Restorable recipe that restores the snapshot into its disposable sandbox, samples file checksums, and runs SQLite integrity validation. Copy it into the directory referenced by your Restorable `agent.yaml` `recipes` setting. Adjust paths for custom layouts; PostgreSQL, external storage, and full application startup are not covered by this recipe. See [Restorable's recipe guide](https://github.com/restorable-dev/restorable#check-types).
+For Restic snapshots with the default local SQLite database, [`integrations/restorable/forgejo.yaml`](integrations/restorable/forgejo.yaml) checks Forgejo's default `WORK_PATH` paths and runs SQLite integrity validation. For a snapshot that also contains an exported PostgreSQL dump, [`integrations/restorable/forgejo-postgres.yaml`](integrations/restorable/forgejo-postgres.yaml) loads it into Restorable's throwaway PostgreSQL container. Edit the paths in either recipe to match your snapshot, then copy the selected recipe into the directory referenced by Restorable's `agent.yaml` `recipes` setting. Neither recipe starts Forgejo or checks external object storage. See [Restorable's recipe guide](https://github.com/restorable-dev/restorable#check-types).
 
 For a customer-authorized, manually supervised full restore rehearsal, see the [recovery drill runbook](docs/RESTORE_DRILL.md). The procedure is not automated or yet validated against a real Forgejo backup.
 

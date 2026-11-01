@@ -1,0 +1,15 @@
+# Forgejo restore verification for a Restic snapshot that also contains a
+# PostgreSQL dump. Adjust both paths to match your backup layout.
+#
+# This loads the dump into a throwaway PostgreSQL container. It does not start
+# Forgejo or verify external object storage, Redis, or custom repository paths.
+name: forgejo-postgres
+checks:
+  - type: files
+    require:
+      - path: custom/conf/app.ini
+      - path: database/forgejo.sql
+    checksum_sample: 5
+
+  - type: postgres
+    dump: database/forgejo.sql
