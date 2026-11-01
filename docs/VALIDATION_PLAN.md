@@ -18,6 +18,7 @@ Interview self-hosters and small organizations that administer their own Forgejo
 8. Would a Forgejo recipe for an existing restore runner meet the need, or do you require a dedicated service? What would still justify paying for help?
 9. If a managed provider or MSP handles backups, what exactly does the contract promise for restore time and data loss? When did anyone last boot a restored Forgejo instance and verify a repository or database record, rather than only confirm that a backup job completed?
 10. What private evidence can you show that the last restore test covered the same backup source, Forgejo version, database, repositories, and external storage you depend on?
+11. Do you test every instance or rotate samples by recovery priority? How do you record the snapshot tested, the actual elapsed recovery time, manual fixes, and application-owner sign-off?
 
 Ask for a recent concrete example. Do not pitch the product before collecting the current workflow.
 
