@@ -10,6 +10,8 @@ Forgejo's documented `dump` command creates an archive and exposes flags to skip
 
 Forgejo can store each subsystem locally or in S3-compatible MinIO, with global defaults and per-subsystem overrides. A dump archive cannot prove that an external bucket was backed up; the included `app.ini` can at least identify these configured external components for operator follow-up. [Forgejo storage guide](https://forgejo.org/docs/v17.0/admin/setup/storage/)
 
+The recovery guide also calls for preserving host keys when Forgejo's built-in SSH server is enabled, because clients can reject the host after recovery if its key changes. The config reference lists the key-pair paths under `[server].SSH_SERVER_HOST_KEYS`; the prototype now reports filename candidates when `[server].START_SSH_SERVER` is enabled. It cannot prove that the key is the correct one or that a custom data path was mapped correctly. [Forgejo recovery guide](https://forgejo.org/docs/v17.0/admin/setup/backup/) · [config reference](https://forgejo.org/docs/v17.0/admin/config-cheat-sheet/)
+
 These facts establish operational complexity, not buyer demand.
 
 ## Adjacent alternatives

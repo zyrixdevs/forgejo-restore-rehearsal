@@ -122,6 +122,8 @@ def inspect(paths, verify_integrity=False, required_components=(), allow_empty_r
     storage = any(optional_components.values())
     config = {"secret_key_configured": None, "oauth_jwt_secret_configured": None}
     storage_types = {component: "unknown" for component in STORAGE_SECTIONS}
+    ssh_enabled = None if not config_files else False
+    ssh_host_key_names = set()
     if config_files:
         config["secret_key_configured"] = False
         config["oauth_jwt_secret_configured"] = False
@@ -136,6 +138,13 @@ def inspect(paths, verify_integrity=False, required_components=(), allow_empty_r
             parser.get("oauth2", "JWT_SECRET", fallback="").strip()
             or parser.get("oauth2", "JWT_SECRET_URI", fallback="").strip()
         )
+        if parser.getboolean("server", "START_SSH_SERVER", fallback=False):
+            ssh_enabled = True
+            host_keys = parser.get("server", "SSH_SERVER_HOST_KEYS", fallback="").strip() or "ssh/gitea.rsa, ssh/gogs.rsa"
+            ssh_host_key_names.update(
+                PurePosixPath(path.strip().replace("\\", "/")).name
+                for path in host_keys.split(",") if path.strip()
+            )
         default_type = parser.get("storage", "STORAGE_TYPE", fallback="local").strip().lower() or "local"
         for component, section in STORAGE_SECTIONS.items():
             storage_type = parser.get(section, "STORAGE_TYPE", fallback=default_type).strip().lower() or default_type
@@ -155,6 +164,14 @@ def inspect(paths, verify_integrity=False, required_components=(), allow_empty_r
     )
     missing_required_components = [
         component for component in required_components if not optional_components[component]
+    ]
+    file_basenames = {PurePosixPath(name).name for name in file_names}
+    ssh_host_key_pairs = [
+        {"private_key": name, "public_key": name + ".pub"}
+        for name in sorted(ssh_host_key_names)
+    ]
+    ssh_host_keys_missing = [
+        name for pair in ssh_host_key_pairs for name in pair.values() if name not in file_basenames
     ]
 
     return {
@@ -179,9 +196,14 @@ def inspect(paths, verify_integrity=False, required_components=(), allow_empty_r
         "app_ini_settings_inspected": bool(config_files),
         "secret_key_configured_in_app_ini": config["secret_key_configured"],
         "oauth_jwt_secret_configured_in_app_ini": config["oauth_jwt_secret_configured"],
+        "built_in_ssh_server_enabled": ssh_enabled,
+        "ssh_host_key_candidates": ssh_host_key_pairs,
+        "ssh_host_key_candidates_look_present": not ssh_host_keys_missing if ssh_enabled else None,
+        "missing_ssh_host_key_candidates": ssh_host_keys_missing,
         "limitations": [
-            "Checks names and two app.ini settings only; it does not validate database contents, every configured path, or file integrity.",
+            "Checks archive names and selected app.ini settings only; it does not validate database contents, every configured path, or file integrity.",
             "Custom repository/storage paths and secrets stored in external files need operator review.",
+            "SSH host-key checks match basenames only and may not reflect custom APP_DATA_PATH layouts.",
             "A passing inventory is not a restore test or proof of recoverability.",
         ],
     }
