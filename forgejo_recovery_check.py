@@ -124,6 +124,7 @@ def inspect(paths, verify_integrity=False, required_components=(), allow_empty_r
     storage_types = {component: "unknown" for component in STORAGE_SECTIONS}
     ssh_enabled = None if not config_files else False
     ssh_host_key_names = set()
+    external_dependencies = set()
     if config_files:
         config["secret_key_configured"] = False
         config["oauth_jwt_secret_configured"] = False
@@ -145,6 +146,18 @@ def inspect(paths, verify_integrity=False, required_components=(), allow_empty_r
                 PurePosixPath(path.strip().replace("\\", "/")).name
                 for path in host_keys.split(",") if path.strip()
             )
+        queue_type = parser.get("queue", "TYPE", fallback="level").strip().lower()
+        if queue_type == "redis":
+            external_dependencies.add("queue:redis")
+        elif queue_type in {"channel", "dummy"}:
+            external_dependencies.add("queue:" + queue_type + " (queued work is not persisted)")
+        issue_indexer = parser.get("indexer", "ISSUE_INDEXER_TYPE", fallback="bleve").strip().lower()
+        if issue_indexer in {"elasticsearch", "meilisearch"}:
+            external_dependencies.add("issue indexer:" + issue_indexer)
+        if parser.getboolean("indexer", "REPO_INDEXER_ENABLED", fallback=False):
+            repo_indexer = parser.get("indexer", "REPO_INDEXER_TYPE", fallback="bleve").strip().lower()
+            if repo_indexer == "elasticsearch":
+                external_dependencies.add("repository indexer:elasticsearch")
         default_type = parser.get("storage", "STORAGE_TYPE", fallback="local").strip().lower() or "local"
         for component, section in STORAGE_SECTIONS.items():
             storage_type = parser.get(section, "STORAGE_TYPE", fallback=default_type).strip().lower() or default_type
@@ -187,6 +200,7 @@ def inspect(paths, verify_integrity=False, required_components=(), allow_empty_r
         "components_using_external_minio_storage": [
             component for component, storage_type in storage_types.items() if storage_type == "minio"
         ],
+        "configured_recovery_dependencies_needing_attention": sorted(external_dependencies),
         "required_optional_components": list(required_components),
         "missing_required_optional_components": missing_required_components,
         "database_candidate_found": database,
