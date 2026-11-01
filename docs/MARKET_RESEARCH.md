@@ -8,6 +8,8 @@ Forgejo says it does not provide or recommend one backup tool. Even the simplest
 
 Forgejo's documented `dump` command creates an archive and exposes flags to skip repositories, LFS, attachments, packages, index data, and repository archives. The official CLI guide does not describe a whole-instance restore subcommand; the recovery guide explains a manual sequence. This makes an operator-facing dump inventory a concrete first tool, although it still cannot prove a successful restore. [Forgejo CLI reference](https://forgejo.org/docs/v17.0/admin/command-line/)
 
+Forgejo can store each subsystem locally or in S3-compatible MinIO, with global defaults and per-subsystem overrides. A dump archive cannot prove that an external bucket was backed up; the included `app.ini` can at least identify these configured external components for operator follow-up. [Forgejo storage guide](https://forgejo.org/docs/v17.0/admin/setup/storage/)
+
 These facts establish operational complexity, not buyer demand.
 
 ## Adjacent alternatives

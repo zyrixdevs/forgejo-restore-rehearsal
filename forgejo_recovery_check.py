@@ -26,6 +26,16 @@ OPTIONAL_COMPONENTS = {
     "actions_artifacts": "actions_artifacts",
     "custom": "custom",
 }
+STORAGE_SECTIONS = {
+    "attachments": "attachment",
+    "lfs": "lfs",
+    "avatars": "avatar",
+    "repository_avatars": "repo-avatar",
+    "repository_archives": "repo-archive",
+    "packages": "packages",
+    "actions_logs": "storage.actions_log",
+    "actions_artifacts": "actions.artifacts",
+}
 
 
 def archive_members(path):
@@ -111,6 +121,7 @@ def inspect(paths, verify_integrity=False, required_components=()):
     }
     storage = any(optional_components.values())
     config = {"secret_key_configured": None, "oauth_jwt_secret_configured": None}
+    storage_types = {component: "unknown" for component in STORAGE_SECTIONS}
     if config_files:
         config["secret_key_configured"] = False
         config["oauth_jwt_secret_configured"] = False
@@ -125,6 +136,13 @@ def inspect(paths, verify_integrity=False, required_components=()):
             parser.get("oauth2", "JWT_SECRET", fallback="").strip()
             or parser.get("oauth2", "JWT_SECRET_URI", fallback="").strip()
         )
+        default_type = parser.get("storage", "STORAGE_TYPE", fallback="local").strip().lower() or "local"
+        for component, section in STORAGE_SECTIONS.items():
+            storage_type = parser.get(section, "STORAGE_TYPE", fallback=default_type).strip().lower() or default_type
+            if storage_types[component] == "unknown":
+                storage_types[component] = storage_type
+            elif storage_types[component] != storage_type:
+                storage_types[component] = "mixed"
 
     core_components = {
         "database": database,
@@ -143,6 +161,10 @@ def inspect(paths, verify_integrity=False, required_components=()):
         "core_components_look_present": all(core_components.values()),
         "database_candidates": database_candidates,
         "optional_component_candidates": optional_components,
+        "configured_storage_type_by_component": storage_types,
+        "components_using_external_minio_storage": [
+            component for component, storage_type in storage_types.items() if storage_type == "minio"
+        ],
         "required_optional_components": list(required_components),
         "missing_required_optional_components": missing_required_components,
         "database_candidate_found": database,
