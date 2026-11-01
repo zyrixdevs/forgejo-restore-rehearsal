@@ -1,6 +1,6 @@
 # Forgejo Restore Rehearsal
 
-An open-source, local-first tool for checking whether a Forgejo backup set contains the recovery components its operator expects.
+An open-source, local-first tool for checking whether a native Forgejo dump contains the recovery components its operator expects.
 
 Forgejo stores state across a database, Git repositories, files, and configuration. Some configuration secrets are required to decrypt credentials after recovery. Forgejo's built-in `dump` command can skip repositories and several data types; this project aims to make obvious omissions visible before an outage. It does not connect to Forgejo, upload data, restore the server, or certify a backup.
 
@@ -28,7 +28,7 @@ An operator in a public DevOps discussion reported discovering that months of ni
 
 ## Business hypothesis
 
-Keep the recovery runner open source. The candidate buyer is an MSP or small organization that must demonstrate recovery readiness for a Forgejo instance. A possible paid offer is a scheduled, supervised isolated restore drill with an evidence report, sold per instance or as an annual service. Pricing and Forgejo-specific willingness to pay are unknown; generic restore assurance is competitive, so this is only a hypothesis.
+Keep the native-dump checker open source. The candidate buyer is an MSP or small organization that must demonstrate recovery readiness for a Forgejo instance. A possible paid offer is a supervised isolated restore drill with an evidence report, sold per instance or as an annual service. Pricing and Forgejo-specific willingness to pay are unknown; general restore assurance is competitive, so this is only a hypothesis.
 
 ## Development
 

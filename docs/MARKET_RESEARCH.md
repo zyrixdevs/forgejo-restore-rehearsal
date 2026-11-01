@@ -12,7 +12,7 @@ These facts establish operational complexity, not buyer demand.
 
 ## Adjacent alternatives
 
-Generic app-aware restore verification is already a product category. [Restorable](https://restorable.dev/) documents real restores in disposable sandboxes, app-aware checks, and recipes for Nextcloud, Vaultwarden, and Immich. [RestoreProof](https://restoreproof.io/) markets disposable restore checks and reports for databases and applications. This overlaps the core promise; Forgejo-specific demand and a distinct advantage are not established.
+Generic app-aware restore verification is already a product category. [Restorable](https://restorable.dev/) requires an existing Restic repository and documents real restores in disposable sandboxes, app-aware checks, and recipes for Nextcloud, Vaultwarden, and Immich. Its public docs do not list a Forgejo recipe. It is not a direct drop-in checker for a raw `forgejo dump` ZIP, although operators may be able to build a workflow around it. [RestoreProof](https://restoreproof.io/) accepts several backup sources and advertises file archive checks, but its public templates do not list Forgejo. This creates a narrow native-dump inspection wedge; it does not yet establish a defensible advantage or willingness to pay.
 
 RestoreProof currently lists €49/month and €249/month plans, including scheduled runs and report history; Restorable describes its cloud dashboard as free during open beta and lists an $8/month Pro plan. These prices show adjacent category pricing, not Forgejo demand, sales, or a viable price for this product.
 
@@ -22,7 +22,7 @@ The current prototype now offers an opt-in ZIP CRC scan, itemized component inve
 
 ## Hypothesis to validate
 
-Offer a free local recovery preflight and rehearsal runner. If organizations repeatedly need help proving Forgejo recoverability, test a paid supervised drill and evidence report. Before building hosted scheduling or restore orchestration, seek five operator interviews, two supervised pilots, and one explicit paid-pilot commitment. These are proposed gates, not achievements.
+Offer a free local checker for Forgejo's native dump format, with operator-selected required components and ZIP integrity scan. If organizations repeatedly need validation beyond this preflight, test a paid supervised isolated restore drill and evidence report. The paid offer would need to differentiate from general restore tools through Forgejo dump compatibility and validation of the whole Forgejo stack. Before building hosted scheduling or restore orchestration, seek five operator interviews, two supervised pilots, and one explicit paid-pilot commitment. These are proposed gates, not achievements.
 
 ## Risks and unknowns
 
