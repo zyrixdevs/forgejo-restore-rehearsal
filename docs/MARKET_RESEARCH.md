@@ -16,7 +16,9 @@ Generic app-aware restore verification is already a product category. [Restorabl
 
 RestoreProof currently lists €49/month and €249/month plans, including scheduled runs and report history; Restorable describes its cloud dashboard as free during open beta and lists an $8/month Pro plan. These prices show adjacent category pricing, not Forgejo demand, sales, or a viable price for this product.
 
-A [Forgejo community thread](https://www.reddit.com/r/forgejo/comments/1o9e16d) asks for a quick check that the `forgejo dump` ZIP is not corrupted and contains expected data such as LFS or SQLite. This is one operator's question, not evidence of broad demand or buying intent. The current prototype now offers an opt-in ZIP CRC scan and component inventory, but still does not run a restore.
+A [Forgejo community thread](https://www.reddit.com/r/forgejo/comments/1o9e16d) asks for a quick check that the `forgejo dump` ZIP is not corrupted and contains expected data such as LFS or SQLite. A separate DevOps discussion includes an operator's report that nightly Forgejo dumps ran for months with the database but without the repository directory, leaving the backup unusable; the operator recommends quarterly throwaway-VM restore drills. The second report is a concrete failure mode the required-repository check could catch. Both are anecdotes, not evidence of market size or buying intent. [DevOps discussion](https://www.reddit.com/r/devops/comments/1vz9wis/how_much_maintenance_to_manage_a_forgejo/)
+
+The current prototype now offers an opt-in ZIP CRC scan, itemized component inventory, and requirements the operator can choose, but still does not run a restore.
 
 ## Hypothesis to validate
 

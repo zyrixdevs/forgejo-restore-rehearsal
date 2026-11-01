@@ -16,6 +16,8 @@ The local CLI inventories backup archives without extracting or executing them, 
 
 Forgejo's administrator guide says backups span multiple data locations and restoring requires coordinating database, files, configuration, and startup. The guide also calls out unique encryption and OAuth secrets that can break stored credentials if they are lost. [Forgejo backup and restore guide](https://forgejo.org/docs/v17.0/admin/setup/backup/)
 
+An operator in a public DevOps discussion reported discovering that months of nightly Forgejo dumps contained the database but not the repositories. This tool's required-component checks target that class of omission; one report does not establish broad demand. [Discussion](https://www.reddit.com/r/devops/comments/1vz9wis/how_much_maintenance_to_manage_a_forgejo/)
+
 ## Safety and scope
 
 - Runs against backup files chosen by the operator; no service login or external upload.
@@ -30,7 +32,7 @@ Keep the recovery runner open source. The candidate buyer is an MSP or small org
 
 ## Development
 
-The preflight inventories archive names and reads up to 1 MiB from `app.ini` to check whether the two documented secret settings are configured. It recognizes likely database, repository, and storage entries and reports whether the core candidates appear present. It does not extract archives or print setting values. If no inspectable `app.ini` is found, secret checks are reported as unknown (`null`), not missing.
+The preflight inventories archive names and reads up to 1 MiB from `app.ini` to check whether the two documented secret settings are configured. It distinguishes SQLite files from SQL dumps, recognizes repository and storage entries, and reports whether core candidates appear present. It does not extract archives or print setting values. If no inspectable `app.ini` is found, secret checks are reported as unknown (`null`), not missing.
 
 ```sh
 python3 forgejo_recovery_check.py backup.tar.gz database.sql.gz --report recovery-report.json

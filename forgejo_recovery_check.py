@@ -84,10 +84,11 @@ def inspect(paths, verify_integrity=False, required_components=()):
                     config_files.append(config_bytes)
 
     basenames = [PurePosixPath(name).name for name in names]
-    database = any(
-        name in {"forgejo.db", "gitea.db"} or name.endswith((".sql", ".sql.gz", ".dump"))
-        for name in basenames
-    )
+    database_candidates = {
+        "sqlite_file": any(name in {"forgejo.db", "gitea.db"} or name.endswith(".sqlite3") for name in basenames),
+        "sql_dump": any(name.endswith((".sql", ".sql.gz", ".dump")) for name in basenames),
+    }
+    database = any(database_candidates.values())
     repositories = any(
         part in {"repos", "forgejo-repositories"}
         for name in names for part in PurePosixPath(name).parts
@@ -128,6 +129,7 @@ def inspect(paths, verify_integrity=False, required_components=()):
         "zip_crc_checks_in_input_order": integrity_checks,
         "core_components": core_components,
         "core_components_look_present": all(core_components.values()),
+        "database_candidates": database_candidates,
         "optional_component_candidates": optional_components,
         "required_optional_components": list(required_components),
         "missing_required_optional_components": missing_required_components,
