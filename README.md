@@ -2,7 +2,7 @@
 
 An open-source, local-first tool for checking whether a Forgejo backup set contains the recovery components its operator expects.
 
-Forgejo stores state across a database, Git repositories, files, and configuration. Some configuration secrets are required to decrypt credentials after recovery. This project aims to make those omissions visible before an outage. It does not connect to Forgejo, upload data, restore the server, or certify a backup.
+Forgejo stores state across a database, Git repositories, files, and configuration. Some configuration secrets are required to decrypt credentials after recovery. Forgejo's built-in `dump` command can skip repositories and several data types; this project aims to make obvious omissions visible before an outage. It does not connect to Forgejo, upload data, restore the server, or certify a backup.
 
 ## Status
 
@@ -30,7 +30,7 @@ Keep the recovery runner open source. If discovery confirms a recurring pain, te
 
 ## Development
 
-The preflight only inventories archive names and reads up to 1 MiB from `app.ini` to check whether the two documented secret settings are configured. It does not extract archives or print setting values. If no inspectable `app.ini` is found, those checks are reported as unknown (`null`), not missing.
+The preflight inventories archive names and reads up to 1 MiB from `app.ini` to check whether the two documented secret settings are configured. It recognizes likely database, repository, and storage entries and reports whether the core candidates appear present. It does not extract archives or print setting values. If no inspectable `app.ini` is found, secret checks are reported as unknown (`null`), not missing.
 
 ```sh
 python3 forgejo_recovery_check.py backup.tar.gz database.sql.gz --report recovery-report.json

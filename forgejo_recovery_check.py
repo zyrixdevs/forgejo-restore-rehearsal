@@ -68,9 +68,15 @@ def inspect(paths):
         name in {"forgejo.db", "gitea.db"} or name.endswith((".sql", ".sql.gz", ".dump"))
         for name in basenames
     )
-    repositories = any("forgejo-repositories" in PurePosixPath(name).parts for name in names)
+    repositories = any(
+        part in {"repos", "forgejo-repositories"}
+        for name in names for part in PurePosixPath(name).parts
+    )
     storage = any(
-        part in {"storage", "attachments", "lfs", "avatars", "repo-avatars", "packages"}
+        part in {
+            "storage", "attachments", "lfs", "avatars", "repo-avatars", "repo-archive",
+            "packages", "actions_log", "actions_artifacts",
+        }
         for name in names for part in PurePosixPath(name).parts
     )
     config = {"secret_key_configured": None, "oauth_jwt_secret_configured": None}
@@ -89,12 +95,20 @@ def inspect(paths):
             or parser.get("oauth2", "JWT_SECRET_URI", fallback="").strip()
         )
 
+    core_components = {
+        "database": database,
+        "app_ini": app_ini_found,
+        "repository_data": repositories,
+    }
+
     return {
         "archive_count": len(paths),
         "entry_count": len(names),
+        "core_components": core_components,
+        "core_components_look_present": all(core_components.values()),
         "database_candidate_found": database,
-        "default_repository_directory_found": repositories,
-        "common_storage_directory_found": storage,
+        "repository_data_candidate_found": repositories,
+        "common_storage_data_candidate_found": storage,
         "app_ini_found": app_ini_found,
         "app_ini_settings_inspected": bool(config_files),
         "secret_key_configured_in_app_ini": config["secret_key_configured"],

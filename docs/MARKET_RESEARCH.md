@@ -6,6 +6,8 @@ Research date: 2026-11-01. Desk research only; no user interviews or purchase ev
 
 Forgejo says it does not provide or recommend one backup tool. Even the simplest setup stores repositories and bulk files on disk and user interaction data in SQL, and a consistent backup while Forgejo is running is not trivial. Restoring requires coordinating the database, files, configuration, and startup. Its guide identifies `[security].SECRET_KEY` as essential to decrypt stored webhook, Actions, mirror, and two-factor credentials; losing the OAuth JWT secret can require integrations to reauthenticate. [Official Forgejo guide](https://forgejo.org/docs/v17.0/admin/setup/backup/)
 
+Forgejo's documented `dump` command creates an archive and exposes flags to skip repositories, LFS, attachments, packages, index data, and repository archives. The official CLI guide does not describe a whole-instance restore subcommand; the recovery guide explains a manual sequence. This makes an operator-facing dump inventory a concrete first tool, although it still cannot prove a successful restore. [Forgejo CLI reference](https://forgejo.org/docs/v17.0/admin/command-line/)
+
 These facts establish operational complexity, not buyer demand.
 
 ## Adjacent alternatives
