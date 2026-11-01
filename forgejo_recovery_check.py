@@ -47,11 +47,20 @@ def archive_members(path):
         return result
 
 
-def inspect(paths):
+def inspect(paths, verify_integrity=False):
     names = []
     config_files = []
     app_ini_found = False
+    integrity_checks = []
     for path in paths:
+        if verify_integrity:
+            if zipfile.is_zipfile(path):
+                with zipfile.ZipFile(path) as archive:
+                    integrity_checks.append("failed" if archive.testzip() else "passed")
+            else:
+                integrity_checks.append("unsupported")
+        else:
+            integrity_checks.append("not_requested")
         members = archive_members(path)
         if len(names) + len(members) > MAX_MEMBERS:
             raise ValueError(f"too many archive entries across inputs (limit {MAX_MEMBERS})")
@@ -104,6 +113,7 @@ def inspect(paths):
     return {
         "archive_count": len(paths),
         "entry_count": len(names),
+        "zip_crc_checks_in_input_order": integrity_checks,
         "core_components": core_components,
         "core_components_look_present": all(core_components.values()),
         "database_candidate_found": database,
@@ -125,9 +135,10 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("archives", nargs="+", help="tar, tar.gz, tgz, or zip backup archives")
     parser.add_argument("--report", help="write JSON report to a new file (default: stdout)")
+    parser.add_argument("--verify-integrity", action="store_true", help="read each ZIP entry and verify its CRC; other formats are reported unsupported")
     args = parser.parse_args()
     try:
-        report = inspect(args.archives)
+        report = inspect(args.archives, args.verify_integrity)
         payload = json.dumps(report, indent=2) + "\n"
         if args.report:
             with open(args.report, "x", encoding="utf-8") as output:
