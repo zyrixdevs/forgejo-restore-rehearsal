@@ -145,9 +145,14 @@ def main():
                 output.write(payload)
         else:
             sys.stdout.write(payload)
+        if not report["core_components_look_present"]:
+            return 1
+        if args.verify_integrity and any(status != "passed" for status in report["zip_crc_checks_in_input_order"]):
+            return 1
+        return 0
     except (OSError, EOFError, RuntimeError, tarfile.TarError, zipfile.BadZipFile, ValueError, configparser.Error) as error:
         parser.error(str(error))
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

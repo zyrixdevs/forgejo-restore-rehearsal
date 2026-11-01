@@ -42,7 +42,7 @@ For ZIP dumps, optionally verify every entry's CRC (this reads the complete unco
 python3 forgejo_recovery_check.py forgejo-dump.zip --verify-integrity
 ```
 
-This checks ZIP entry integrity only; it does not prove database consistency or a successful application restore. Other archive formats report the CRC check as unsupported.
+This checks ZIP entry integrity only; it does not prove database consistency or a successful application restore. Other archive formats report the CRC check as unsupported. The command exits nonzero if a core component candidate is missing or a requested CRC check fails or is unsupported.
 
 The report is a hint for operator review. Custom storage and repository paths, external secret files, object storage, database validity, consistency, and application behavior are not verified. Read [`docs/MARKET_RESEARCH.md`](docs/MARKET_RESEARCH.md) before treating this as a product direction.
 
