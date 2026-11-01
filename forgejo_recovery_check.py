@@ -77,7 +77,7 @@ def archive_members(path):
         return result
 
 
-def inspect(paths, verify_integrity=False, required_components=()):
+def inspect(paths, verify_integrity=False, required_components=(), allow_empty_repositories=False):
     names = []
     config_files = []
     file_names = []
@@ -149,6 +149,10 @@ def inspect(paths, verify_integrity=False, required_components=()):
         "app_ini": app_ini_found,
         "repository_data": repositories,
     }
+    waived_core_components = ["repository_data"] if allow_empty_repositories and not repositories else []
+    core_components_look_present = all(
+        found or component in waived_core_components for component, found in core_components.items()
+    )
     missing_required_components = [
         component for component in required_components if not optional_components[component]
     ]
@@ -158,7 +162,8 @@ def inspect(paths, verify_integrity=False, required_components=()):
         "entry_count": len(names),
         "zip_crc_checks_in_input_order": integrity_checks,
         "core_components": core_components,
-        "core_components_look_present": all(core_components.values()),
+        "core_components_look_present": core_components_look_present,
+        "waived_core_components": waived_core_components,
         "database_candidates": database_candidates,
         "optional_component_candidates": optional_components,
         "configured_storage_type_by_component": storage_types,
@@ -188,9 +193,10 @@ def main():
     parser.add_argument("--report", help="write JSON report to a new file (default: stdout)")
     parser.add_argument("--verify-integrity", action="store_true", help="read each ZIP entry and verify its CRC; other formats are reported unsupported")
     parser.add_argument("--require-component", action="append", choices=OPTIONAL_COMPONENTS, default=[], metavar="NAME", help="require an optional component; repeat for each (" + ", ".join(OPTIONAL_COMPONENTS) + ")")
+    parser.add_argument("--allow-empty-repositories", action="store_true", help="waive the repository candidate check for an instance known to contain no repositories")
     args = parser.parse_args()
     try:
-        report = inspect(args.archives, args.verify_integrity, args.require_component)
+        report = inspect(args.archives, args.verify_integrity, args.require_component, args.allow_empty_repositories)
         payload = json.dumps(report, indent=2) + "\n"
         if args.report:
             with open(args.report, "x", encoding="utf-8") as output:

@@ -45,7 +45,7 @@ python3 forgejo_recovery_check.py forgejo-dump.zip --verify-integrity
 python3 forgejo_recovery_check.py forgejo-dump.zip --require-component lfs --require-component attachments
 ```
 
-This checks ZIP entry integrity only; it does not prove database consistency or a successful application restore. Other archive formats report the CRC check as unsupported. The command exits nonzero if a core component candidate is missing or a requested CRC check fails or is unsupported.
+This checks ZIP entry integrity only; it does not prove database consistency or a successful application restore. Other archive formats report the CRC check as unsupported. The command exits nonzero if a core component candidate is missing or a requested CRC check fails or is unsupported. If the instance legitimately has no repositories, `--allow-empty-repositories` waives only that candidate check and records the waiver in the report.
 
 The report lists likely presence for attachments, LFS, avatars, repository avatars/archives, packages, Actions data, and custom files. It also reads `STORAGE_TYPE` values from `app.ini` and identifies components configured for MinIO/S3; it cannot verify that the external object store was backed up. Required optional components must be chosen by the operator. Custom local paths, external secret files, database validity, consistency, and application behavior are not verified. Read [`docs/MARKET_RESEARCH.md`](docs/MARKET_RESEARCH.md) before treating this as a product direction.
 
