@@ -28,7 +28,7 @@ An operator in a public DevOps discussion reported discovering that months of ni
 
 ## Business hypothesis
 
-Keep the native-dump checker and Restorable recipe open source. The candidate buyer is an MSP managing several Forgejo instances. The paid hypothesis is setup/support and supervised restore drills using an existing isolated runner, sold per drill; pricing and Forgejo-specific willingness to pay are unknown. General restore assurance is competitive, so this remains unvalidated.
+Keep the native-dump checker and Restorable recipes open source. Managed Forgejo services already bundle backups, and enterprise providers advertise restore-testing help. The narrow paid hypothesis is a provider-independent, customer-controlled Forgejo restore drill with private evidence for self-hosted teams/MSPs whose current backup arrangement does not test application recovery. Charge per drill only if discovery confirms that gap. No price, buyer demand, or sales are validated; see [`docs/MARKET_RESEARCH.md`](docs/MARKET_RESEARCH.md).
 
 ## Development
 
