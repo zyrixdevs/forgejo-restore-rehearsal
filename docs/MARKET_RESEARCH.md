@@ -22,6 +22,8 @@ Generic app-aware restore verification is already a product category. [Restorabl
 
 RestoreProof currently lists €49/month and €249/month plans, including scheduled runs and report history; Restorable describes its cloud dashboard as free during open beta and lists an $8/month Pro plan. These prices show adjacent category pricing, not Forgejo demand, sales, or a viable price for this product.
 
+There is also a service-priced alternative to a low-cost SaaS subscription: Warmar Tech lists a $395 restore test and a $495 backup audit, while clarifying that final scope and eligibility are confirmed after review. These are generic small-business continuity services, not Forgejo-specific offers or evidence of actual sales. They support testing a one-time, assisted Forgejo recovery-evidence review through MSPs before investing in hosted scheduling; they do not validate a $395 Forgejo price. [Warmar Tech continuity services and pricing](https://warmartech.com/services/continuity/)
+
 ## Forgejo-specific commercial alternatives
 
 Managed Forgejo providers already bundle backup operations. Fjord lists $49/month and $149/month per-instance plans with encrypted nightly backups and 90-day retention; its published restore model is operator-run from a runbook, with no point-in-time restore or contractual RTO at launch. That leaves a possible need for independent restore evidence, but does not show whether customers want to buy a separate tool for it. [Fjord pricing and restore model](https://fj.fjord.sh/pricing)
@@ -48,7 +50,7 @@ The current prototype offers an opt-in ZIP CRC scan, itemized component inventor
 
 ## Hypothesis to validate
 
-Keep the preflight and Restorable recipes open source. Test a fixed-scope, customer-controlled restore drill for self-hosted teams/MSPs as an add-on to their current backup arrangement, producing a private checklist/report of what actually restored. Charge per completed drill only if interviews show that managed providers or generic restore tools leave a Forgejo-specific evidence gap. No price is justified yet. A standalone runner is worth building only if interviews find checks the generic engine cannot handle. Before expanding into hosted scheduling, seek five operator interviews, two supervised pilots, and one explicit paid-pilot commitment. These are proposed gates, not achievements.
+Keep the preflight and Restorable recipes open source. Test a one-time, customer-controlled Forgejo recovery-evidence review through self-hosting MSPs as an add-on to their current backup arrangement, producing a private checklist/report from a selected backup and an authorized isolated restore drill. Use $395 only as an initial price anchor drawn from a generic MSP's published restore-test service, then validate willingness to pay before quoting it as our price. This services-first path avoids competing on an $8/month cloud tier before proving Forgejo-specific differentiation. A standalone runner or hosted scheduling is worth building only if interviews find checks generic tools cannot handle. Before expanding, seek five operator interviews, two supervised pilots, and one explicit paid-pilot commitment. These are proposed gates, not achievements.
 
 ## Risks and unknowns
 
